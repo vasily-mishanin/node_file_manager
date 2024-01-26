@@ -1,0 +1,26 @@
+{
+  "name": "node_file_manager",
+  "version": "1.0.0",
+  "description": "Rolling Scopes Node.js 2024 Assignment: https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/file-manager/assignment.md",
+  "main": "main.js",
+  "type": "module",
+  "engines": { "node": ">=20.0.0"},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/vasily-mishanin/node_file_manager.git"
+  },
+  "keywords": [
+    "file",
+    "manager"
+  ],
+  "author": "Vasily",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vasily-mishanin/node_file_manager/issues"
+  },
+  "homepage": "https://github.com/vasily-mishanin/node_file_manager#readme"
+}
