@@ -4,6 +4,7 @@ import {
   changeDir,
   listDirItems,
   readAndPrint,
+  creaTeNewFile,
 } from './comandsHandlers.js';
 import * as readline from 'node:readline/promises';
 import { fileURLToPath } from 'url';
@@ -67,7 +68,7 @@ rl.on('line', (line) => {
       workingDirectory = changeDir(workingDirectory, arg) ?? workingDirectory;
       rl.write(`You are currently in ${workingDirectory} \n`);
     } else {
-      rl.write(`Specify argument for new path: \n`);
+      rl.write(`Specify argument for new path \n`);
     }
   }
 
@@ -81,7 +82,16 @@ rl.on('line', (line) => {
     if (filePath) {
       readAndPrint(workingDirectory, filePath);
     } else {
-      rl.write(`Not file path. Specify argument for file path: \n`);
+      rl.write(`Not file path. Specify argument for file path \n`);
+    }
+  }
+
+  if (command === 'add') {
+    const newFileName = arg;
+    if (newFileName) {
+      creaTeNewFile(workingDirectory, newFileName);
+    } else {
+      rl.write(`Not new file name. Specify argument for new file name \n`);
     }
   }
 });

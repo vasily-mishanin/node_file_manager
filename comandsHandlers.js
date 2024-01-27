@@ -66,10 +66,22 @@ export function readAndPrint(workingDirectory, filePath) {
     process.stdout.write(`\n ----------------- END ----------------- \n`);
     process.stdout.write(`You are currently in ${workingDirectory} \n`);
   });
+}
 
-  // if (!fs.existsSync(fileToReadPath)) {
-  //   throw new Error(`FS operation failed - ${fileToReadPath} NOT EXISTS`);
-  // } else {
-  //   readAndPrintFile(fileToReadPath);
-  // }
+/**
+ * Creates new file in specified workingDirectory
+ * @param {string} workingDirectory
+ * @param {string} fileName
+ */
+
+export function creaTeNewFile(workingDirectory, fileName) {
+  const absPath = path.resolve(workingDirectory, fileName);
+  if (fs.existsSync(workingDirectory) && !fs.existsSync(absPath)) {
+    fs.writeFile(absPath, '', () => {
+      process.stdout.write(`New file - ${fileName} - successfully created \n`);
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
+    });
+  } else {
+    throw Error(`FS operation failed - file path ${absPath} ALREADY EXISTS`);
+  }
 }
