@@ -1,8 +1,10 @@
-import { getUserName, parseCommand, goUp, changeDir } from './utils.js';
+import { getUserName, parseCommand } from './utils.js';
+import { goUp, changeDir, listDirItems } from './comandsHandlers.js';
 import * as readline from 'node:readline/promises';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import os from 'os';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,7 +26,7 @@ const COMMANDS = [
   'decompress',
   'os',
 ];
-const ARGUMEMTS = [
+const OS_ARGUMEMTS = [
   '--EOL',
   '--cpus',
   '--homedir',
@@ -62,6 +64,11 @@ rl.on('line', (line) => {
     } else {
       rl.write(`Specify argument for new path: \n`);
     }
+  }
+
+  if (command === 'ls') {
+    listDirItems(workingDirectory);
+    rl.write(`You are currently in ${workingDirectory} \n`);
   }
 
   // split "cd path_to_directory"

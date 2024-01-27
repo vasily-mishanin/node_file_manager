@@ -16,26 +16,14 @@ export function parseCommand(command) {
   return command.trim().replace(/[ ]+/i, ' ').split(' ').slice(0, 2);
 }
 
-// UP
-export function goUp(currentPath) {
-  if (currentPath === os.homedir()) {
-    return;
+export function getItemType(workingDirectory, item) {
+  const absPath = path.resolve(workingDirectory, item);
+  if (fs.existsSync(absPath)) {
+    return fs.statSync(absPath).isDirectory() ? 'directory' : 'file';
   }
-
-  return path.dirname(currentPath);
+  return null;
 }
 
-// CD
-export function changeDir(workingDirectory, newPath) {
-  const newAbsolutePath = path.resolve(workingDirectory, newPath);
-
-  if (
-    fs.existsSync(newAbsolutePath) &&
-    fs.statSync(newAbsolutePath).isDirectory()
-  ) {
-    return newAbsolutePath;
-  } else {
-    console.log('---Directory not found---');
-    return null;
-  }
+export function logTable(items, cols) {
+  console.table(items, cols);
 }
