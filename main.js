@@ -10,6 +10,7 @@ import {
   deleteFile,
   moveFile,
   calculateHash,
+  compress,
 } from './comandsHandlers.js';
 import * as readline from 'node:readline/promises';
 import { fileURLToPath } from 'url';
@@ -212,6 +213,30 @@ rl.on('line', (line) => {
     } else {
       rl.write(
         `Invalid command - should be "hash path_to_file". Specify argument \n`
+      );
+      rl.write(`You are currently in ${workingDirectory} \n`);
+    }
+  }
+
+  // COMPRESS compress path_to_file path_to_destination
+
+  if (command === 'compress') {
+    const pathToFile = arg1;
+    const pathToDestination = arg2;
+
+    if (pathToFile && pathToDestination) {
+      compress(pathToFile, pathToDestination, workingDirectory).then((res) => {
+        if (res?.message) {
+          rl.write(`${res.message} \n`);
+          rl.write(`You are currently in ${workingDirectory} \n`);
+        } else {
+          rl.write(`Compresed file ${pathToFile} \n`);
+          rl.write(`You are currently in ${workingDirectory} \n`);
+        }
+      });
+    } else {
+      rl.write(
+        `Invalid command - should be "compress path_to_file path_to_destination". Specify arguments \n`
       );
       rl.write(`You are currently in ${workingDirectory} \n`);
     }

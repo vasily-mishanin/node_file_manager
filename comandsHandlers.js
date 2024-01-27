@@ -2,6 +2,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { createHash } from 'node:crypto';
+import zlib, { gzip } from 'zlib';
 
 import {
   logTable,
@@ -292,4 +293,29 @@ export async function calculateHash(pathToFile, workingDirectory) {
       reject(error);
     });
   });
+}
+
+//compress
+export async function compress(
+  pathToFile,
+  pathToDestination,
+  workingDirectory
+) {
+  const absPathToFile = path.resolve(workingDirectory, pathToFile);
+  const absPathToDestination = path.resolve(
+    workingDirectory,
+    pathToDestination
+  );
+
+  if (
+    fs.existsSync(absPathToFile) &&
+    fs.existsSync(path.dirname(absPathToDestination))
+  ) {
+    const zipBrotli = zlib.createBrotliCompress();
+    const readStream = fs.createReadStream(absPathToFile);
+    const writeStream = fs.createWriteStream(absPathToDestination);
+    readStream.pipe(zipBrotli).pipe(writeStream);
+  } else {
+    return { message: 'Wrong paths' };
+  }
 }
