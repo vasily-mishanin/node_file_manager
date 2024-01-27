@@ -113,6 +113,12 @@ export function renameFile(pathToFile, newFileName, workingDirectory) {
   }
 }
 
+/**
+ *
+ * @param {string} pathToFile
+ * @param {string} pathToNewDirectory
+ * @param {string} workingDirectory
+ */
 export function copyFile(pathToFile, pathToNewDirectory, workingDirectory) {
   const existingFilePath = path.resolve(workingDirectory, pathToFile);
   const copyFileDirectoryPath = path.resolve(
@@ -121,21 +127,30 @@ export function copyFile(pathToFile, pathToNewDirectory, workingDirectory) {
   );
   const filename = path.basename(existingFilePath);
 
-  if (!fs.existsSync(existingFilePath)) {
-    throw new Error(`FS operation failed - ${existingFilePath} NOT EXISTS`);
+  if (
+    !fs.existsSync(existingFilePath) ||
+    !fs.existsSync(copyFileDirectoryPath)
+  ) {
+    process.stdout.write(`FS operation failed - path/paths NOT EXISTS \n`);
+    process.stdout.write(`You are currently in ${workingDirectory} \n`);
+    return;
   } else if (fs.existsSync(path.join(copyFileDirectoryPath, filename))) {
-    throw new Error(
-      `FS operation failed - file ${filename} ALREADY EXISTS in ${copyFileDirectoryPath} `
+    process.stdout.write(
+      `FS operation failed - file ${filename} ALREADY EXISTS in ${copyFileDirectoryPath} \n`
     );
+    process.stdout.write(`You are currently in ${workingDirectory} \n`);
+    return;
   }
 
   if (
     fs.statSync(existingFilePath).isDirectory() ||
     !fs.statSync(copyFileDirectoryPath).isDirectory()
   ) {
-    throw new Error(
-      `FS operation failed - INVALID ARGUMENTS (should be "cp path_to_file path_to_new_directory")`
+    process.stdout.write(
+      `FS operation failed - INVALID ARGUMENTS (should be "cp path_to_file path_to_new_directory") \n`
     );
+    process.stdout.write(`You are currently in ${workingDirectory} \n`);
+    return;
   } else {
     const readStream = fs.createReadStream(existingFilePath);
     const writeStream = fs.createWriteStream(
@@ -150,4 +165,102 @@ export function copyFile(pathToFile, pathToNewDirectory, workingDirectory) {
       process.stdout.write(`ERROR WHEN COPY`, err);
     });
   }
+}
+
+/**
+ *
+ * @param {string} pathToFile
+ * @param {string} pathToNewDirectory
+ * @param {string} workingDirectory
+ * @returns
+ */
+export function moveFile(pathToFile, pathToNewDirectory, workingDirectory) {
+  const existingFilePath = path.resolve(workingDirectory, pathToFile);
+  const copyFileDirectoryPath = path.resolve(
+    workingDirectory,
+    pathToNewDirectory
+  );
+  const filename = path.basename(existingFilePath);
+
+  if (
+    !fs.existsSync(existingFilePath) ||
+    !fs.existsSync(copyFileDirectoryPath)
+  ) {
+    process.stdout.write(`FS operation failed - path/paths NOT EXISTS \n`);
+    process.stdout.write(`You are currently in ${workingDirectory} \n`);
+    return;
+  } else if (fs.existsSync(path.join(copyFileDirectoryPath, filename))) {
+    process.stdout.write(
+      `FS operation failed - file ${filename} ALREADY EXISTS in ${copyFileDirectoryPath} \n`
+    );
+    process.stdout.write(`You are currently in ${workingDirectory} \n`);
+    return;
+  }
+
+  if (
+    fs.statSync(existingFilePath).isDirectory() ||
+    !fs.statSync(copyFileDirectoryPath).isDirectory()
+  ) {
+    process.stdout.write(
+      `FS operation failed - INVALID ARGUMENTS (should be "cp path_to_file path_to_new_directory") \n`
+    );
+    process.stdout.write(`You are currently in ${workingDirectory} \n`);
+    return;
+  } else {
+    const readStream = fs.createReadStream(existingFilePath);
+    const writeStream = fs.createWriteStream(
+      path.join(copyFileDirectoryPath, filename)
+    );
+    readStream.pipe(writeStream);
+
+    writeStream.on('finish', () => {
+      fs.unlink(existingFilePath, (err) => {
+        if (err) {
+          console.log(`Error while unlinking file ${filename}`, err);
+          throw err;
+        }
+        process.stdout.write(`File copy completed \n`);
+        process.stdout.write(`You are currently in ${workingDirectory} \n`);
+      });
+    });
+
+    writeStream.on('error', (err) => {
+      process.stdout.write(`ERROR WHEN COPY`, err);
+    });
+  }
+}
+
+/**
+ *
+ * @param {string} pathToFile
+ * @param {string} workingDirectory
+ * @param {boolean} partOfMoveOperation
+ * @returns
+ */
+export function deleteFile(pathToFile, workingDirectory) {
+  const existingFilePath = path.resolve(workingDirectory, pathToFile);
+  const filename = path.basename(existingFilePath);
+
+  if (!fs.existsSync(existingFilePath)) {
+    process.stdout.write(
+      `Unable to delete file - ${existingFilePath} - NOT EXISTS \n`
+    );
+    process.stdout.write(`You are currently in ${workingDirectory} \n`);
+    return;
+  } else if (fs.statSync(existingFilePath).isDirectory()) {
+    process.stdout.write(
+      `Unable to delete file - ${existingFilePath} - IS DIRECTORY \n`
+    );
+    process.stdout.write(`You are currently in ${workingDirectory} \n`);
+    return;
+  }
+
+  fs.unlink(existingFilePath, (err) => {
+    if (err) {
+      console.log(`Error while unlinking file ${filename}`, err);
+      throw err;
+    }
+    process.stdout.write(`File ${filename} deleted \n`);
+    process.stdout.write(`You are currently in ${workingDirectory} \n`);
+  });
 }

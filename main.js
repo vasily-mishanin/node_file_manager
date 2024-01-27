@@ -7,6 +7,8 @@ import {
   creaTeNewFile,
   renameFile,
   copyFile,
+  deleteFile,
+  moveFile,
 } from './comandsHandlers.js';
 import * as readline from 'node:readline/promises';
 import { fileURLToPath } from 'url';
@@ -105,8 +107,9 @@ rl.on('line', (line) => {
       renameFile(pathToFile, newFileName, workingDirectory);
     } else {
       rl.write(
-        `Command should be "rn path_to_file new_filename". Specify both arguments \n`
+        `Invalid command - should be "rn path_to_file new_filename". Specify both arguments \n`
       );
+      rl.write(`You are currently in ${workingDirectory} \n`);
     }
   }
 
@@ -118,8 +121,37 @@ rl.on('line', (line) => {
       copyFile(pathToFile, pathToNewDirectory, workingDirectory);
     } else {
       rl.write(
-        `Command should be "cp path_to_file path_to_new_directory". Specify both arguments \n`
+        `Invalid command - should be "cp path_to_file path_to_new_directory". Specify both arguments \n`
       );
+      rl.write(`You are currently in ${workingDirectory} \n`);
+    }
+  }
+
+  // mv path_to_file path_to_new_directory
+  if (command === 'mv') {
+    const pathToFile = arg1;
+    const pathToNewDirectory = arg2;
+
+    if (pathToFile && pathToNewDirectory) {
+      moveFile(pathToFile, pathToNewDirectory, workingDirectory);
+    } else {
+      rl.write(
+        `Invalid command - should be "mv path_to_file path_to_new_directory". Specify both arguments \n`
+      );
+      rl.write(`You are currently in ${workingDirectory} \n`);
+    }
+  }
+
+  //rm path_to_file
+  if (command == 'rm') {
+    const pathToFile = arg1;
+    if (pathToFile) {
+      deleteFile(pathToFile, workingDirectory);
+    } else {
+      rl.write(
+        `Invalid command - should be "rm path_to_file". Specify argument \n`
+      );
+      rl.write(`You are currently in ${workingDirectory} \n`);
     }
   }
 });
