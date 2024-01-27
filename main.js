@@ -5,6 +5,7 @@ import {
   listDirItems,
   readAndPrint,
   creaTeNewFile,
+  renameFile,
 } from './comandsHandlers.js';
 import * as readline from 'node:readline/promises';
 import { fileURLToPath } from 'url';
@@ -56,7 +57,7 @@ rl.on('line', (line) => {
     rl.close();
   }
 
-  const [command, arg] = parseCommand(line);
+  const [command, arg1, arg2] = parseCommand(line);
 
   if (command === 'up') {
     workingDirectory = goUp(workingDirectory) ?? workingDirectory;
@@ -64,8 +65,8 @@ rl.on('line', (line) => {
   }
 
   if (command === 'cd') {
-    if (arg) {
-      workingDirectory = changeDir(workingDirectory, arg) ?? workingDirectory;
+    if (arg1) {
+      workingDirectory = changeDir(workingDirectory, arg1) ?? workingDirectory;
       rl.write(`You are currently in ${workingDirectory} \n`);
     } else {
       rl.write(`Specify argument for new path \n`);
@@ -78,7 +79,7 @@ rl.on('line', (line) => {
   }
 
   if (command === 'cat') {
-    const filePath = arg;
+    const filePath = arg1;
     if (filePath) {
       readAndPrint(workingDirectory, filePath);
     } else {
@@ -87,11 +88,24 @@ rl.on('line', (line) => {
   }
 
   if (command === 'add') {
-    const newFileName = arg;
+    const newFileName = arg1;
     if (newFileName) {
       creaTeNewFile(workingDirectory, newFileName);
     } else {
       rl.write(`Not new file name. Specify argument for new file name \n`);
+    }
+  }
+
+  if (command === 'rn') {
+    const pathToFile = arg1;
+    const newFileName = arg2;
+
+    if (pathToFile && newFileName) {
+      renameFile(pathToFile, newFileName, workingDirectory);
+    } else {
+      rl.write(
+        `Command should be "rn path_to_file new_filename". Specify both arguments \n`
+      );
     }
   }
 });

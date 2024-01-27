@@ -18,7 +18,7 @@ export function getUserName(args) {
  * @returns {string []} [command, argument]
  */
 export function parseCommand(command) {
-  return command.trim().replace(/[ ]+/i, ' ').split(' ').slice(0, 2);
+  return command.trim().replace(/[ ]+/i, ' ').split(' ').slice(0, 3);
 }
 
 /**

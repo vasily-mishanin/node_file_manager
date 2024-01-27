@@ -85,3 +85,30 @@ export function creaTeNewFile(workingDirectory, fileName) {
     throw Error(`FS operation failed - file path ${absPath} ALREADY EXISTS`);
   }
 }
+
+/**
+ *
+ * @param {string} pathToFile
+ * @param {string} newFileName
+ * @param {string} workingDirectory
+ */
+
+export function renameFile(pathToFile, newFileName, workingDirectory) {
+  const oldPath = path.resolve(workingDirectory, pathToFile);
+  const newPath = path.resolve(workingDirectory, newFileName);
+
+  if (!fs.existsSync(oldPath)) {
+    throw new Error(`FS operation failed - ${oldPath} NOT EXISTS`);
+  } else if (fs.existsSync(newPath)) {
+    throw new Error(`FS operation failed - ${newPath} ALREADY EXISTS`);
+  } else {
+    fs.rename(oldPath, newPath, (err) => {
+      if (err) {
+        console.error('Error renaming file:', err);
+      } else {
+        process.stdout.write('----File renamed successfully--- \n');
+        process.stdout.write(`You are currently in ${workingDirectory} \n`);
+      }
+    });
+  }
+}
