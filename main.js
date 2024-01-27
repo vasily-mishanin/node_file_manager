@@ -36,6 +36,7 @@ const COMMANDS = [
   'decompress',
   'os',
 ];
+
 const OS_ARGUMEMTS = [
   '--EOL',
   '--cpus',
@@ -43,6 +44,7 @@ const OS_ARGUMEMTS = [
   '--username',
   '--architecture',
 ];
+
 const ROOT_DIR = os.homedir();
 let workingDirectory = ROOT_DIR;
 
@@ -151,6 +153,48 @@ rl.on('line', (line) => {
       rl.write(
         `Invalid command - should be "rm path_to_file". Specify argument \n`
       );
+      rl.write(`You are currently in ${workingDirectory} \n`);
+    }
+  }
+
+  // OS Commands
+  if (command === 'os' && !OS_ARGUMEMTS.includes(arg1)) {
+    rl.write(`Invalid command - ${arg1} is not valid argument \n`);
+    rl.write(`Avalable options: ${OS_ARGUMEMTS} \n`);
+    rl.write(`You are currently in ${workingDirectory} \n`);
+  } else {
+    if (command === 'os' && arg1 === '--EOL') {
+      rl.write(os.EOL);
+      rl.write(`You are currently in ${workingDirectory} \n`);
+    }
+
+    if (command === 'os' && arg1 === '--cpus') {
+      let cpus = os.cpus();
+      cpus = cpus.map((cpu) => ({
+        model: cpu.model,
+        speed: `${cpu.speed} GHz`,
+      }));
+      rl.write(`CPUs amount: ${cpus.length}\n`);
+      cpus.forEach((cpu, index) => {
+        rl.write(`${index + 1}\n`);
+        rl.write(`model:${cpu.model}\n`);
+        rl.write(`speed:${cpu.speed}\n`);
+      });
+      rl.write(`You are currently in ${workingDirectory} \n`);
+    }
+
+    if (command === 'os' && arg1 === '--homedir') {
+      rl.write(os.homedir() + '\n');
+      rl.write(`You are currently in ${workingDirectory} \n`);
+    }
+
+    if (command === 'os' && arg1 === '--username') {
+      rl.write(os.userInfo().username + '\n');
+      rl.write(`You are currently in ${workingDirectory} \n`);
+    }
+
+    if (command === 'os' && arg1 === '--architecture') {
+      rl.write(os.arch() + '\n');
       rl.write(`You are currently in ${workingDirectory} \n`);
     }
   }
