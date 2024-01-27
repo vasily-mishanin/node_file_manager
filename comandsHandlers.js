@@ -319,3 +319,28 @@ export async function compress(
     return { message: 'Wrong paths' };
   }
 }
+
+//decompress
+export async function decompress(
+  pathToFile,
+  pathToDestination,
+  workingDirectory
+) {
+  const absPathToFile = path.resolve(workingDirectory, pathToFile);
+  const absPathToDestination = path.resolve(
+    workingDirectory,
+    pathToDestination
+  );
+
+  if (
+    fs.existsSync(absPathToFile) &&
+    fs.existsSync(path.dirname(absPathToDestination))
+  ) {
+    const unzipBrotli = zlib.createBrotliDecompress();
+    const readStream = fs.createReadStream(absPathToFile);
+    const writeStream = fs.createWriteStream(absPathToDestination);
+    readStream.pipe(unzipBrotli).pipe(writeStream);
+  } else {
+    return { message: 'Wrong paths' };
+  }
+}

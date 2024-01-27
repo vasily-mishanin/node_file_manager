@@ -11,6 +11,7 @@ import {
   moveFile,
   calculateHash,
   compress,
+  decompress,
 } from './comandsHandlers.js';
 import * as readline from 'node:readline/promises';
 import { fileURLToPath } from 'url';
@@ -219,7 +220,6 @@ rl.on('line', (line) => {
   }
 
   // COMPRESS compress path_to_file path_to_destination
-
   if (command === 'compress') {
     const pathToFile = arg1;
     const pathToDestination = arg2;
@@ -230,13 +230,38 @@ rl.on('line', (line) => {
           rl.write(`${res.message} \n`);
           rl.write(`You are currently in ${workingDirectory} \n`);
         } else {
-          rl.write(`Compresed file ${pathToFile} \n`);
+          rl.write(`Compressed file ${pathToFile} \n`);
           rl.write(`You are currently in ${workingDirectory} \n`);
         }
       });
     } else {
       rl.write(
         `Invalid command - should be "compress path_to_file path_to_destination". Specify arguments \n`
+      );
+      rl.write(`You are currently in ${workingDirectory} \n`);
+    }
+  }
+
+  // DECOMPRESS decompress path_to_file path_to_destination
+  if (command === 'decompress') {
+    const pathToFile = arg1;
+    const pathToDestination = arg2;
+
+    if (pathToFile && pathToDestination) {
+      decompress(pathToFile, pathToDestination, workingDirectory).then(
+        (res) => {
+          if (res?.message) {
+            rl.write(`${res.message} \n`);
+            rl.write(`You are currently in ${workingDirectory} \n`);
+          } else {
+            rl.write(`Decompressed file ${pathToFile} \n`);
+            rl.write(`You are currently in ${workingDirectory} \n`);
+          }
+        }
+      );
+    } else {
+      rl.write(
+        `Invalid command - should be "decompress path_to_file path_to_destination". Specify arguments \n`
       );
       rl.write(`You are currently in ${workingDirectory} \n`);
     }
