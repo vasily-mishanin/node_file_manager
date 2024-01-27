@@ -9,6 +9,7 @@ import {
   copyFile,
   deleteFile,
   moveFile,
+  calculateHash,
 } from './comandsHandlers.js';
 import * as readline from 'node:readline/promises';
 import { fileURLToPath } from 'url';
@@ -195,6 +196,23 @@ rl.on('line', (line) => {
 
     if (command === 'os' && arg1 === '--architecture') {
       rl.write(os.arch() + '\n');
+      rl.write(`You are currently in ${workingDirectory} \n`);
+    }
+  }
+
+  // HASH
+  // hash path_to_file
+  if (command === 'hash') {
+    const pathToFile = arg1;
+    if (pathToFile) {
+      calculateHash(pathToFile, workingDirectory).then((hash) => {
+        rl.write(hash + '\n');
+        rl.write(`You are currently in ${workingDirectory} \n`);
+      });
+    } else {
+      rl.write(
+        `Invalid command - should be "hash path_to_file". Specify argument \n`
+      );
       rl.write(`You are currently in ${workingDirectory} \n`);
     }
   }
