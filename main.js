@@ -24,7 +24,7 @@ const __dirname = path.dirname(__filename);
 
 const username = getUserName(process.argv.slice(2));
 
-const COMMANDS = [
+export const COMMANDS = [
   'up',
   'cd',
   'ls',
@@ -38,6 +38,7 @@ const COMMANDS = [
   'compress',
   'decompress',
   'os',
+  '.exit',
 ];
 
 const OS_ARGUMEMTS = [
@@ -61,49 +62,67 @@ const rl = readline.createInterface({
 });
 
 rl.on('line', (line) => {
-  if (line.includes('.exit')) {
+  const [command, arg1, arg2] = parseCommand(line);
+
+  if (!COMMANDS.includes(command)) {
+    console.log(`Uknown command: ${command}`);
+    console.log(`Avalable commands: ${COMMANDS}`);
+    console.log(`You are currently in ${workingDirectory}`);
+  }
+
+  if (command === '.exit') {
     rl.close();
   }
 
-  const [command, arg1, arg2] = parseCommand(line);
-
+  // up
   if (command === 'up') {
     workingDirectory = goUp(workingDirectory) ?? workingDirectory;
-    rl.write(`You are currently in ${workingDirectory} \n`);
+    process.stdout.write(`You are currently in ${workingDirectory} \n`);
   }
 
+  // cd
   if (command === 'cd') {
     if (arg1) {
       workingDirectory = changeDir(workingDirectory, arg1) ?? workingDirectory;
-      rl.write(`You are currently in ${workingDirectory} \n`);
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
     } else {
-      rl.write(`Specify argument for new path \n`);
+      process.stdout.write(
+        `Specify argument for new path (cd path_to_directory) \n`
+      );
     }
   }
 
+  // ls - list items
   if (command === 'ls') {
     listDirItems(workingDirectory);
-    rl.write(`You are currently in ${workingDirectory} \n`);
+    process.stdout.write(`You are currently in ${workingDirectory} \n`);
   }
 
+  // cat
   if (command === 'cat') {
     const filePath = arg1;
     if (filePath) {
       readAndPrint(workingDirectory, filePath);
     } else {
-      rl.write(`Not file path. Specify argument for file path \n`);
+      process.stdout.write(
+        `No file path. Specify argument for file path like cat myfile.txt \n`
+      );
     }
   }
 
+  // add
   if (command === 'add') {
     const newFileName = arg1;
     if (newFileName) {
       creaTeNewFile(workingDirectory, newFileName);
     } else {
-      rl.write(`Not new file name. Specify argument for new file name \n`);
+      process.stdout.write(
+        `No new file name. Specify argument for new file name \n`
+      );
     }
   }
 
+  // rn - rename
   if (command === 'rn') {
     const pathToFile = arg1;
     const newFileName = arg2;
@@ -111,13 +130,14 @@ rl.on('line', (line) => {
     if (pathToFile && newFileName) {
       renameFile(pathToFile, newFileName, workingDirectory);
     } else {
-      rl.write(
+      process.stdout.write(
         `Invalid command - should be "rn path_to_file new_filename". Specify both arguments \n`
       );
-      rl.write(`You are currently in ${workingDirectory} \n`);
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
     }
   }
 
+  // cp - copy
   if (command === 'cp') {
     const pathToFile = arg1;
     const pathToNewDirectory = arg2;
@@ -125,10 +145,10 @@ rl.on('line', (line) => {
     if (pathToFile && pathToNewDirectory) {
       copyFile(pathToFile, pathToNewDirectory, workingDirectory);
     } else {
-      rl.write(
+      process.stdout.write(
         `Invalid command - should be "cp path_to_file path_to_new_directory". Specify both arguments \n`
       );
-      rl.write(`You are currently in ${workingDirectory} \n`);
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
     }
   }
 
@@ -140,35 +160,35 @@ rl.on('line', (line) => {
     if (pathToFile && pathToNewDirectory) {
       moveFile(pathToFile, pathToNewDirectory, workingDirectory);
     } else {
-      rl.write(
+      process.stdout.write(
         `Invalid command - should be "mv path_to_file path_to_new_directory". Specify both arguments \n`
       );
-      rl.write(`You are currently in ${workingDirectory} \n`);
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
     }
   }
 
-  //rm path_to_file
+  // rm - delete file
   if (command == 'rm') {
     const pathToFile = arg1;
     if (pathToFile) {
       deleteFile(pathToFile, workingDirectory);
     } else {
-      rl.write(
+      process.stdout.write(
         `Invalid command - should be "rm path_to_file". Specify argument \n`
       );
-      rl.write(`You are currently in ${workingDirectory} \n`);
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
     }
   }
 
   // OS Commands
   if (command === 'os' && !OS_ARGUMEMTS.includes(arg1)) {
-    rl.write(`Invalid command - ${arg1} is not valid argument \n`);
-    rl.write(`Avalable options: ${OS_ARGUMEMTS} \n`);
-    rl.write(`You are currently in ${workingDirectory} \n`);
+    process.stdout.write(`Invalid command - ${arg1} is not valid argument \n`);
+    process.stdout.write(`Avalable options: ${OS_ARGUMEMTS} \n`);
+    process.stdout.write(`You are currently in ${workingDirectory} \n`);
   } else {
     if (command === 'os' && arg1 === '--EOL') {
-      rl.write(os.EOL);
-      rl.write(`You are currently in ${workingDirectory} \n`);
+      process.stdout.write(os.EOL);
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
     }
 
     if (command === 'os' && arg1 === '--cpus') {
@@ -177,28 +197,28 @@ rl.on('line', (line) => {
         model: cpu.model,
         speed: `${cpu.speed} GHz`,
       }));
-      rl.write(`CPUs amount: ${cpus.length}\n`);
+      process.stdout.write(`CPUs amount: ${cpus.length}\n`);
       cpus.forEach((cpu, index) => {
-        rl.write(`${index + 1}\n`);
-        rl.write(`model:${cpu.model}\n`);
-        rl.write(`speed:${cpu.speed}\n`);
+        process.stdout.write(`${index + 1}\n`);
+        process.stdout.write(`model:${cpu.model}\n`);
+        process.stdout.write(`speed:${cpu.speed}\n`);
       });
-      rl.write(`You are currently in ${workingDirectory} \n`);
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
     }
 
     if (command === 'os' && arg1 === '--homedir') {
-      rl.write(os.homedir() + '\n');
-      rl.write(`You are currently in ${workingDirectory} \n`);
+      process.stdout.write(os.homedir() + '\n');
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
     }
 
     if (command === 'os' && arg1 === '--username') {
-      rl.write(os.userInfo().username + '\n');
-      rl.write(`You are currently in ${workingDirectory} \n`);
+      process.stdout.write(os.userInfo().username + '\n');
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
     }
 
     if (command === 'os' && arg1 === '--architecture') {
-      rl.write(os.arch() + '\n');
-      rl.write(`You are currently in ${workingDirectory} \n`);
+      process.stdout.write(os.arch() + '\n');
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
     }
   }
 
@@ -208,14 +228,14 @@ rl.on('line', (line) => {
     const pathToFile = arg1;
     if (pathToFile) {
       calculateHash(pathToFile, workingDirectory).then((hash) => {
-        rl.write(hash + '\n');
-        rl.write(`You are currently in ${workingDirectory} \n`);
+        process.stdout.write(hash + '\n');
+        process.stdout.write(`You are currently in ${workingDirectory} \n`);
       });
     } else {
-      rl.write(
+      process.stdout.write(
         `Invalid command - should be "hash path_to_file". Specify argument \n`
       );
-      rl.write(`You are currently in ${workingDirectory} \n`);
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
     }
   }
 
@@ -227,18 +247,18 @@ rl.on('line', (line) => {
     if (pathToFile && pathToDestination) {
       compress(pathToFile, pathToDestination, workingDirectory).then((res) => {
         if (res?.message) {
-          rl.write(`${res.message} \n`);
-          rl.write(`You are currently in ${workingDirectory} \n`);
+          process.stdout.write(`${res.message} \n`);
+          process.stdout.write(`You are currently in ${workingDirectory} \n`);
         } else {
-          rl.write(`Compressed file ${pathToFile} \n`);
-          rl.write(`You are currently in ${workingDirectory} \n`);
+          process.stdout.write(`Compressed file ${pathToFile} \n`);
+          process.stdout.write(`You are currently in ${workingDirectory} \n`);
         }
       });
     } else {
-      rl.write(
+      process.stdout.write(
         `Invalid command - should be "compress path_to_file path_to_destination". Specify arguments \n`
       );
-      rl.write(`You are currently in ${workingDirectory} \n`);
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
     }
   }
 
@@ -251,19 +271,19 @@ rl.on('line', (line) => {
       decompress(pathToFile, pathToDestination, workingDirectory).then(
         (res) => {
           if (res?.message) {
-            rl.write(`${res.message} \n`);
-            rl.write(`You are currently in ${workingDirectory} \n`);
+            process.stdout.write(`${res.message} \n`);
+            process.stdout.write(`You are currently in ${workingDirectory} \n`);
           } else {
-            rl.write(`Decompressed file ${pathToFile} \n`);
-            rl.write(`You are currently in ${workingDirectory} \n`);
+            process.stdout.write(`Decompressed file ${pathToFile} \n`);
+            process.stdout.write(`You are currently in ${workingDirectory} \n`);
           }
         }
       );
     } else {
-      rl.write(
+      process.stdout.write(
         `Invalid command - should be "decompress path_to_file path_to_destination". Specify arguments \n`
       );
-      rl.write(`You are currently in ${workingDirectory} \n`);
+      process.stdout.write(`You are currently in ${workingDirectory} \n`);
     }
   }
 });
@@ -273,6 +293,8 @@ rl.on('SIGINT', () => {
 });
 
 rl.on('close', () => {
-  rl.write(`Thank you for using File Manager, ${username}, goodbye!`);
+  process.stdout.write(
+    `Thank you for using File Manager, ${username}, goodbye!`
+  );
   process.exit();
 });
