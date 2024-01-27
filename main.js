@@ -1,6 +1,78 @@
-import { getUserName } from './utils.js';
-//console.log(process.argv);
+import { getUserName, parseCommand, goUp, changeDir } from './utils.js';
+import * as readline from 'node:readline/promises';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import os from 'os';
 
-console.log(
-  `Welcome to the File Manager, ${getUserName(process.argv.slice(2))}!`
-);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const username = getUserName(process.argv.slice(2));
+
+const COMMANDS = [
+  'up',
+  'cd',
+  'ls',
+  'cat',
+  'add',
+  'rn',
+  'cp',
+  'mv',
+  'rm',
+  'hash',
+  'compress',
+  'decompress',
+  'os',
+];
+const ARGUMEMTS = [
+  '--EOL',
+  '--cpus',
+  '--homedir',
+  '--username',
+  '--architecture',
+];
+const ROOT_DIR = os.homedir();
+let workingDirectory = ROOT_DIR;
+
+// START
+console.log(`Welcome to the File Manager, ${username}!`);
+console.log(`You are currently in ${workingDirectory}`);
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+rl.on('line', (line) => {
+  if (line.includes('.exit')) {
+    rl.close();
+  }
+
+  const [command, arg] = parseCommand(line);
+
+  if (command === 'up') {
+    workingDirectory = goUp(workingDirectory) ?? workingDirectory;
+    rl.write(`You are currently in ${workingDirectory} \n`);
+  }
+
+  if (command === 'cd') {
+    if (arg) {
+      workingDirectory = changeDir(workingDirectory, arg) ?? workingDirectory;
+      rl.write(`You are currently in ${workingDirectory} \n`);
+    } else {
+      rl.write(`Specify argument for new path: \n`);
+    }
+  }
+
+  // split "cd path_to_directory"
+  //if(command === 'cd')
+});
+
+rl.on('SIGINT', () => {
+  rl.close();
+});
+
+rl.on('close', () => {
+  rl.write(`Thank you for using File Manager, ${username}, goodbye!`);
+  process.exit();
+});
