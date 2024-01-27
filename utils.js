@@ -12,10 +12,21 @@ export function getUserName(args) {
   return userNameArg ? getArgValue(userNameArg) : null;
 }
 
+/**
+ * parseCommand
+ * @param {string} command
+ * @returns {string []} [command, argument]
+ */
 export function parseCommand(command) {
   return command.trim().replace(/[ ]+/i, ' ').split(' ').slice(0, 2);
 }
 
+/**
+ * getItemType
+ * @param {string} workingDirectory
+ * @param {string} item
+ * @returns {'directory' | 'file' | null}
+ */
 export function getItemType(workingDirectory, item) {
   const absPath = path.resolve(workingDirectory, item);
   if (fs.existsSync(absPath)) {

@@ -1,5 +1,10 @@
 import { getUserName, parseCommand } from './utils.js';
-import { goUp, changeDir, listDirItems } from './comandsHandlers.js';
+import {
+  goUp,
+  changeDir,
+  listDirItems,
+  readAndPrint,
+} from './comandsHandlers.js';
 import * as readline from 'node:readline/promises';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -71,8 +76,14 @@ rl.on('line', (line) => {
     rl.write(`You are currently in ${workingDirectory} \n`);
   }
 
-  // split "cd path_to_directory"
-  //if(command === 'cd')
+  if (command === 'cat') {
+    const filePath = arg;
+    if (filePath) {
+      readAndPrint(workingDirectory, filePath);
+    } else {
+      rl.write(`Not file path. Specify argument for file path: \n`);
+    }
+  }
 });
 
 rl.on('SIGINT', () => {

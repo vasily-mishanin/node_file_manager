@@ -47,3 +47,29 @@ export function listDirItems(workingDirectory) {
 
   logTable(processedItems, ['name', 'type']);
 }
+
+// cat
+/**
+ * cat - readAndPrint file content
+ * @param {string} filePath
+ *
+ */
+
+export function readAndPrint(workingDirectory, filePath) {
+  const absPath = path.resolve(workingDirectory, filePath);
+  const readStream = fs.createReadStream(absPath);
+  readStream.on('data', (chunk) => {
+    process.stdout.write(chunk + '\n');
+  });
+
+  readStream.on('end', () => {
+    process.stdout.write(`\n ----------------- END ----------------- \n`);
+    process.stdout.write(`You are currently in ${workingDirectory} \n`);
+  });
+
+  // if (!fs.existsSync(fileToReadPath)) {
+  //   throw new Error(`FS operation failed - ${fileToReadPath} NOT EXISTS`);
+  // } else {
+  //   readAndPrintFile(fileToReadPath);
+  // }
+}
