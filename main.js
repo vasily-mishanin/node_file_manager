@@ -6,6 +6,7 @@ import {
   readAndPrint,
   creaTeNewFile,
   renameFile,
+  copyFile,
 } from './comandsHandlers.js';
 import * as readline from 'node:readline/promises';
 import { fileURLToPath } from 'url';
@@ -105,6 +106,19 @@ rl.on('line', (line) => {
     } else {
       rl.write(
         `Command should be "rn path_to_file new_filename". Specify both arguments \n`
+      );
+    }
+  }
+
+  if (command === 'cp') {
+    const pathToFile = arg1;
+    const pathToNewDirectory = arg2;
+
+    if (pathToFile && pathToNewDirectory) {
+      copyFile(pathToFile, pathToNewDirectory, workingDirectory);
+    } else {
+      rl.write(
+        `Command should be "cp path_to_file path_to_new_directory". Specify both arguments \n`
       );
     }
   }
