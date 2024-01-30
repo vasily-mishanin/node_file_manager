@@ -4,15 +4,19 @@ import {
   changeDir,
   listDirItems,
   readAndPrint,
-  creaTeNewFile,
-  renameFile,
-  copyFile,
-  deleteFile,
-  moveFile,
   calculateHash,
   compress,
   decompress,
 } from './comandsHandlers.js';
+
+import {
+  createNewFile,
+  renameFile,
+  copyFile,
+  moveFile,
+  deleteFile,
+} from './fileHandlers';
+
 import * as readline from 'node:readline/promises';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -114,7 +118,7 @@ rl.on('line', (line) => {
   if (command === 'add') {
     const newFileName = arg1;
     if (newFileName) {
-      creaTeNewFile(workingDirectory, newFileName);
+      createNewFile(workingDirectory, newFileName);
     } else {
       process.stdout.write(
         `No new file name. Specify argument for new file name \n`
