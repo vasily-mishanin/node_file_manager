@@ -1,64 +1,33 @@
+import { COMMANDS, OS_ARGUMEMTS, colors } from './constants.js';
+import { calculateHash } from './hash_handlers.js';
+import { changeDir, goUp, listDirItems, readAndPrint } from './nav_handlers.js';
 import { getUserName, parseCommand } from './utils.js';
-import {
-  goUp,
-  changeDir,
-  listDirItems,
-  readAndPrint,
-  calculateHash,
-  compress,
-  decompress,
-} from './comandsHandlers.js';
+import { compress, decompress } from './zip_handlers.js';
 
 import {
-  createNewFile,
-  renameFile,
   copyFile,
-  moveFile,
+  createNewFile,
   deleteFile,
-} from './fileHandlers';
+  moveFile,
+  renameFile,
+} from './fs_handlers.js';
 
 import * as readline from 'node:readline/promises';
-import { fileURLToPath } from 'url';
-import path from 'path';
 import os from 'os';
-import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const username = getUserName(process.argv.slice(2));
 
-export const COMMANDS = [
-  'up',
-  'cd',
-  'ls',
-  'cat',
-  'add',
-  'rn',
-  'cp',
-  'mv',
-  'rm',
-  'hash',
-  'compress',
-  'decompress',
-  'os',
-  '.exit',
-];
-
-const OS_ARGUMEMTS = [
-  '--EOL',
-  '--cpus',
-  '--homedir',
-  '--username',
-  '--architecture',
-];
-
 const ROOT_DIR = os.homedir();
 let workingDirectory = ROOT_DIR;
 
 // START
-console.log(`Welcome to the File Manager, ${username}!`);
-console.log(`You are currently in ${workingDirectory}`);
+console.log(colors.cyan, `Welcome to the File Manager, ${username}!`);
+console.log(colors.yellow, `You are currently in ${workingDirectory}`);
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -69,11 +38,12 @@ rl.on('line', (line) => {
   const [command, arg1, arg2] = parseCommand(line);
 
   if (!COMMANDS.includes(command)) {
-    console.log(`Uknown command: ${command}`);
-    console.log(`Avalable commands: ${COMMANDS}`);
-    console.log(`You are currently in ${workingDirectory}`);
+    console.log(colors.red, `Uknown command: ${command}`);
+    console.log(colors.cyan, `Avalable commands: ${COMMANDS}`);
+    console.log(colors.yellow, `You are currently in ${workingDirectory}`);
   }
 
+  // Exit
   if (command === '.exit') {
     rl.close();
   }
@@ -231,10 +201,14 @@ rl.on('line', (line) => {
   if (command === 'hash') {
     const pathToFile = arg1;
     if (pathToFile) {
-      calculateHash(pathToFile, workingDirectory).then((hash) => {
-        process.stdout.write(hash + '\n');
-        process.stdout.write(`You are currently in ${workingDirectory} \n`);
-      });
+      calculateHash(pathToFile, workingDirectory)
+        .then((hash) => {
+          if (hash?.length) {
+            process.stdout.write(hash + '\n');
+          }
+          process.stdout.write(`You are currently in ${workingDirectory} \n`);
+        })
+        .catch((err) => console.log(err));
     } else {
       process.stdout.write(
         `Invalid command - should be "hash path_to_file". Specify argument \n`
@@ -247,6 +221,7 @@ rl.on('line', (line) => {
   if (command === 'compress') {
     const pathToFile = arg1;
     const pathToDestination = arg2;
+    console.log(pathToFile, pathToDestination);
 
     if (pathToFile && pathToDestination) {
       compress(pathToFile, pathToDestination, workingDirectory).then((res) => {
@@ -254,13 +229,15 @@ rl.on('line', (line) => {
           process.stdout.write(`${res.message} \n`);
           process.stdout.write(`You are currently in ${workingDirectory} \n`);
         } else {
-          process.stdout.write(`Compressed file ${pathToFile} \n`);
+          process.stdout.write(
+            `Compressed file ${pathToFile} into ${pathToDestination} \n`
+          );
           process.stdout.write(`You are currently in ${workingDirectory} \n`);
         }
       });
     } else {
       process.stdout.write(
-        `Invalid command - should be "compress path_to_file path_to_destination". Specify arguments \n`
+        `Invalid command - should be "compress path_to_file path_to_destination". Specify full paths \n`
       );
       process.stdout.write(`You are currently in ${workingDirectory} \n`);
     }
@@ -278,7 +255,9 @@ rl.on('line', (line) => {
             process.stdout.write(`${res.message} \n`);
             process.stdout.write(`You are currently in ${workingDirectory} \n`);
           } else {
-            process.stdout.write(`Decompressed file ${pathToFile} \n`);
+            process.stdout.write(
+              `Decompressed file ${pathToFile} into ${pathToDestination} \n`
+            );
             process.stdout.write(`You are currently in ${workingDirectory} \n`);
           }
         }

@@ -1,5 +1,8 @@
+import fs from 'fs';
+import path from 'path';
+
 /**
- * Creates new file in specified workingDirectory
+ * add -  Creates new file in specified workingDirectory
  * @param {string} workingDirectory
  * @param {string} fileName
  */
@@ -12,12 +15,15 @@ export function createNewFile(workingDirectory, fileName) {
       process.stdout.write(`You are currently in ${workingDirectory} \n`);
     });
   } else {
-    throw Error(`FS operation failed - file path ${absPath} ALREADY EXISTS`);
+    //throw Error(`FS operation failed - file path ${absPath} ALREADY EXISTS`);
+    process.stdout.write(
+      `FS operation failed - file path ${absPath} ALREADY EXISTS \n`
+    );
   }
 }
 
 /**
- * Rename a file
+ * rn -  Rename a file
  * @param {string} pathToFile
  * @param {string} newFileName
  * @param {string} workingDirectory
@@ -28,9 +34,15 @@ export function renameFile(pathToFile, newFileName, workingDirectory) {
   const newPath = path.resolve(workingDirectory, newFileName);
 
   if (!fs.existsSync(oldPath)) {
-    throw new Error(`FS operation failed - ${oldPath} NOT EXISTS`);
+    //throw new Error(`FS operation failed - ${oldPath} NOT EXISTS`);
+    process.stdout.write(
+      `FS operation failed - file path ${oldPath} NOT EXISTS \n`
+    );
   } else if (fs.existsSync(newPath)) {
-    throw new Error(`FS operation failed - ${newPath} ALREADY EXISTS`);
+    //throw new Error(`FS operation failed - ${newPath} ALREADY EXISTS`);
+    process.stdout.write(
+      `FS operation failed - file path ${newPath} ALREADY EXISTS \n`
+    );
   } else {
     fs.rename(oldPath, newPath, (err) => {
       if (err) {
@@ -44,7 +56,7 @@ export function renameFile(pathToFile, newFileName, workingDirectory) {
 }
 
 /**
- * Copy file to destination folder
+ * cp - Copy file to destination folder
  * @param {string} pathToFile
  * @param {string} pathToNewDirectory
  * @param {string} workingDirectory
@@ -98,7 +110,7 @@ export function copyFile(pathToFile, pathToNewDirectory, workingDirectory) {
 }
 
 /**
- * Move file from one to another specified directory
+ * mv - Move file from one to another specified directory
  * @param {string} pathToFile
  * @param {string} pathToNewDirectory
  * @param {string} workingDirectory
@@ -116,7 +128,7 @@ export function moveFile(pathToFile, pathToNewDirectory, workingDirectory) {
     !fs.existsSync(existingFilePath) ||
     !fs.existsSync(copyFileDirectoryPath)
   ) {
-    process.stdout.write(`FS operation failed - path/paths NOT EXISTS \n`);
+    process.stdout.write(`FS operation failed - WRONG PATH \n`);
     process.stdout.write(`You are currently in ${workingDirectory} \n`);
     return;
   } else if (fs.existsSync(path.join(copyFileDirectoryPath, filename))) {
@@ -149,7 +161,7 @@ export function moveFile(pathToFile, pathToNewDirectory, workingDirectory) {
           console.log(`Error while unlinking file ${filename}`, err);
           throw err;
         }
-        process.stdout.write(`File copy completed \n`);
+        process.stdout.write(`File moving completed \n`);
         process.stdout.write(`You are currently in ${workingDirectory} \n`);
       });
     });
