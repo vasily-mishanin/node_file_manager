@@ -2,3 +2,6 @@
 
 Rolling Scopes Node.js 2024
 Assignment: https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/file-manager/assignment.md
+
+Self-estimate  
+330 / 330
